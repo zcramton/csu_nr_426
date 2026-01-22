@@ -116,20 +116,26 @@ print (f"{courseName} is {courseDurationWk} weeks long.")
 
 ##  7. Work with index notation for a string (and recall that -1 indexes from the end)
 #     a- Create a variable to represent a shapefile (just make something up): C:\student\NR426\LandCover.shp
-path = r"C:\Users\Zacha\College Classes\NR426\CO_NDVI.shp"
+fullPath = r"C:\Users\Zacha\College Classes\NR426\CO_NDVI.shp"
 
 #     b- Write the code using index notation to parse out and print just the shapefile name without any path or extension
 #     ex: The dataset name is: LandCover
-print (f"The dataset name is {path[-11:-4]}.")
+print (f"The dataset name is {fullPath[-11:-4]}.")
 
 #    c- Write the code using index notation to parse out and print just the file extension
 #     ex: The file extension is .shp
-print (f"The file extention is {path[-4:]}.")
+print (f"The file extension is {fullPath[-4:]}.")
+
 #    d-	Can you find another approach to splitting the file name from the path? (Hint: look in the os module)
 
+# Splitting the file name using os.path.splitext()
+sp1 = path.splitext(fullPath)
+print (sp1)
+print (f"The file name is {sp1[1]}.")
 
-
-
+# Splitting the file name (and removing the extension) using fileName.split("delineator")
+sp2 = fullPath.split("\\")
+print(f"The data name is {sp2[5][:-4]}.")
 
 ##  8. Basic built-in functions
 #    a-Use the appropriate function to determine and print out the -length- of
