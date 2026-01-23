@@ -116,7 +116,7 @@ print (f"{courseName} is {courseDurationWk} weeks long.")
 
 ##  7. Work with index notation for a string (and recall that -1 indexes from the end)
 #     a- Create a variable to represent a shapefile (just make something up): C:\student\NR426\LandCover.shp
-fullPath = r"C:\Users\Zacha\College Classes\NR426\CO_NDVI.shp"
+fullPath = r"C:\Users\Zacha\College Classes\NR426\CO_Grassland.shp"
 
 #     b- Write the code using index notation to parse out and print just the shapefile name without any path or extension
 #     ex: The dataset name is: LandCover
@@ -131,31 +131,39 @@ print (f"The file extension is {fullPath[-4:]}.")
 # Splitting the file name using os.path.splitext()
 sp1 = path.splitext(fullPath)
 print (sp1)
-print (f"The file name is {sp1[1]}.")
+print (f"The file name is {file2}.")
 
 # Splitting the file name (and removing the extension) using fileName.split("delineator")
 sp2 = fullPath.split("\\")
-print(f"The data name is {sp2[5][:-4]}.")
+file2 = sp2[5]
+print (f"The data name is {file2[:-4]}.")
 
 ##  8. Basic built-in functions
 #    a-Use the appropriate function to determine and print out the -length- of
 #     two of your previously created variables, in well formatted sentences.
-
+print (f"The length of the path is {len(fullPath)} characters.")
+print (f"The length of the file name is {len(file2)} characters.")
 
 #    b- What -type- of object does the function you use above return? Use the correct function to return that information.
-
+print (f"The len(), length function returns a {type(len(fullPath))} variable.")
 
 #    c- Create a number variable with 4 decimals that represents a fictional area value for a polygon. (123.4567)
 #       Write a print statement that dynamically reports the number, -rounded- to 2 decimal places (using the appropriate function),
 #       along with other text. Sample result:
 #       example result: The area of the open space is 123.46 acres
-
-
+polyArea = 314.159
+print (f"The area of the polygon is {round(polyArea, 2)} square meters.")
 
 #  9. Importing and using the os module
 #     The os library is quite useful for working with files.
 #     Look into the os library https://www.geeksforgeeks.org/os-module-python-examples/ samples and write the code to:
 #    a- Import the os library in the appropriate location in this script
+       # Done, see line 32.
 #    b- Create a variable representing a file path (Copy your class folder path, remember to format the slashes or use r)
+filePath = r"C:\Users\Zacha\PycharmProjects\NR426\Labs\Lab1"
+
 #    c- Create a second variable representing the name of a potential dataset in that folder (like LandCover.shp)
+dataName = "CO_WaterBodies.shp"
+
 #    d-	Combine the path and file names into one complete string with correctly formatted slashes, using the os library
+fileLocation = filePath + dataName
