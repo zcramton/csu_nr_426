@@ -131,7 +131,7 @@ print (f"The file extension is {fullPath[-4:]}.")
 # Splitting the file name using os.path.splitext()
 sp1 = path.splitext(fullPath)
 print (sp1)
-print (f"The file name is {file2}.")
+print (f"The file extension is {sp1}.")
 
 # Splitting the file name (and removing the extension) using fileName.split("delineator")
 sp2 = fullPath.split("\\")
