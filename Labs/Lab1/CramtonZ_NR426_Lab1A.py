@@ -158,7 +158,7 @@ print (f"The area of the polygon is {round(polyArea, 2)} square meters.")
 #     The os library is quite useful for working with files.
 #     Look into the os library https://www.geeksforgeeks.org/os-module-python-examples/ samples and write the code to:
 #    a- Import the os library in the appropriate location in this script
-       # Done, see line 32.
+       # Done, see line 32 for import.
 #    b- Create a variable representing a file path (Copy your class folder path, remember to format the slashes or use r)
 filePath = r"C:\Users\Zacha\PycharmProjects\NR426\Labs\Lab1"
 
