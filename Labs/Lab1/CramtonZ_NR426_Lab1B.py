@@ -43,7 +43,7 @@ print(f"The winner is {winner}")
 
 #In a geospatial context, you may need to randomly select a certain number of features for sampling.
 
-#### Self-directed actvities, done on your own (goes with Lesson 1B) ####
+#### Self-directed activities, done on your own (goes with Lesson 1B) ####
 ## *** IMPORTANT: Refer to the Lab 1B instructions for all the details for this part ***
 
 
@@ -122,19 +122,25 @@ for state in fcStatesList:
 
 #  5 - Practicing with an if statement and multiple conditions. Use variables, add comments.
 
+#slope = 50
+# Ask user for slope input
+slope = int(input ("What is the slope, in degrees?"))
+if slope == 0:
+    print ("Great for camping")
+elif 0 < slope < 15:
+    print ("Good to camp.")
+elif slope > 15:
+    print ("Too steep to camp.")
+else:
+    print ("None of the above.")
 
 #  6 - Break the code above and have a neighbor spot the errors
-
+### Skipped
 
 #  7 - Look at sample code with instructor on screen - update file paths, experiment with creating string outputs
 # Nothing to submit for this step.
 
-
-
-
-
-
-####Lesson 1C:  More Self-directed actvities, done on your own  ####
+####Lesson 1C:  More Self-directed activities, done on your own  ####
 
 
 #  8 - Manipulating strings to prepare file names
@@ -143,9 +149,17 @@ for state in fcStatesList:
 #     combine with the path, and capitalize the file name
 #     Refer to the Lab 1 instructions for details, hints, and examples
 
+# Import modules
+import os
 
+# Defining list contents and path string
+files = ["roads.shp", "trails.shp", "streams.shp", "boundary.shp", "peaks.shp"]
+path = r"C:\Users\Zacha\PycharmProjects\NR426\data"
 
-
+print ("The output feature class names once imported will be:")
+for shp in files:
+    # Remove file ext (.shp), capitalize file names, add the file path to get full paths
+    print (os.path.join(path, shp[:-4].title()))
 
 #  9 - Create a string variable (ie, for a land cover type) and examine it for the occurrence of a particular word.
 #       Use an if statement to return a message to the user if the word is in the variable or not
@@ -153,10 +167,36 @@ for state in fcStatesList:
 #       and what website gave you the answer
 #      Refer to the Lab 1 instructions for details and hints
 
+# Define land cover type list and set up str var selection.
+NLCDtypes = ["Deciduous Forest", "Evergreen Forest", "Mixed Forest", "Shrub/Scrub", "Pasture/Hay", "Open Water"]
+landCoverType = NLCDtypes[1]
+searchClass = "forest"
+# Check if landCoverType contains "forest".
+if searchClass.title() in landCoverType.title():
+    print (f"{landCoverType.capitalize()} is a {searchClass.lower()} type.")
+else:
+    print (f"{landCoverType.capitalize()} is not a {searchClass.lower()} type.")
 
-
+# I searched google for "contains string python" and used the "Check if String Contains Substring in Python"
+# article on geeksforgeeeks.com choosing the "if search in var:" search method becuase it didn't require a
+# module.
 
 #  10 - Working with filenames and paths
 #   a - Write the code to determine if a file or folder exists or not, by creating a string variable for
 #        a file/path name and using the appropriate os module method and an if statement.
 #   b - Return the result in a well formatted sentence.
+
+# Define path and search file
+path = r"C:\Users\Zacha\PycharmProjects\NR426\Lesson1"
+File1 = "CramtonZ_NR426_Lab1A.py" # Does not exist at path (\NR426\Labs\Lab1\...
+File2 = "L1a_ClassDemo.py" # Exists at path
+searchFile = File2         # Change File# to test
+
+fullPath = os.path.join(path, searchFile) # Create full path
+# print(fullPath)                          # Test if full path worked correctly
+
+if os.path.exists(fullPath):
+    print (f"{searchFile} exists at {path}.")
+else:
+    print (f"{searchFile} does not exist at {path}.")
+    print ("Check your path and file names, then try again.")
