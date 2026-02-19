@@ -130,6 +130,7 @@ print(f"Final Rasters: {arcpy.ListRasters()}")
 print("="*30)
 
 # Questions
-print (f"Is listing creating separate variables for dscR and dscFC necessary?")
-print (f"Since they aren't used it parallel it seems like it should be okay but probably better form.")
-print (f"Same question for srR and srFC...")
+print (f"Instructor Questions:")
+print (f"\t- Is listing creating separate variables for dscR and dscFC necessary?")
+print (f"\t- Since they aren't used it parallel it seems like it should be okay but probably better form.")
+print (f"\t- Same question for srR and srFC...")
