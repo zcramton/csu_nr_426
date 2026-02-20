@@ -5,7 +5,7 @@ Date: 17FEB2026
 
 Submitted without Lab 4A Demo, as instructed.
 
-This lab practices the basicss of using cursors and accessing tables. Given the choice between CO Stream Gauge Data
+This lab practices the basics of using cursors and accessing tables. Given the choice between CO Stream Gauge Data
 from USGS and Larimer County Trail data, I selected Larimer Trail data to practice table manipulation with.
 """
 
