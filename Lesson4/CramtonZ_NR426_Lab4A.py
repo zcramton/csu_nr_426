@@ -16,8 +16,8 @@ import sys
 
 from Lesson4.CramtonZ_NR426_L4Ademo import fldList
 
-# Data Path, Workspace (& Report Setup)
-trails_url = r"https://services1.arcgis.com/KNdRU5cN6ENqCTjk/arcgis/rest/services/Larimer_County_Trail_Popularity/FeatureServer"
+# Data Path & Workspace Setup
+trails_url = r"https://services1.arcgis.com/KNdRU5cN6ENqCTjk/arcgis/rest/services/Larimer_County_Trail_Popularity/FeatureServer/"
 arcpy.env.workspace = trails_url
 
 if not arcpy.Exists(arcpy.env.workspace):
@@ -25,18 +25,36 @@ if not arcpy.Exists(arcpy.env.workspace):
     print ("Program exiting...")
     sys.exit()
 
-# Variables
-trails = os.path.join(trails_url, "Trail_LC_NAD83_UTM13N")
-fldList = arcpy.ListFields("")
-tgtFld = "surface"
-tgtAttrib = "gravel"
+# ----- Variables -----
+# trails = os.path.join(trails_url, "Trail_LC_NAD83_UTM13N")
+# fldList = arcpy.ListFields("")
+# tgtFld = "surface"
+# tgtAttrib = "gravel"
 
+# Field Names (Column Headers)
+fld_name = "TRLNAME"       # Name of the trail
+fld_surface = "surface"    # Surface type
+fld_pop = "suit_score"     # Popularity (alias for suit_score)
+fld_max_elev = "max_elevat"  # Max elevation
+fld_min_elev = "min_elevat"  # Min elevation
+
+# Input Values / Criteria
+tgt_surf = "gravel"  # Try 'track' or 'concrete' later
+pop_threshold = 1.7
+record_limit = 10          # Counter limit for task 1d
+
+# Backup / Output paths
+backupName = "LarimerTrail_original"
+outputLayer = "HighValue_Trails"
 
 # 1. Return trail names for gravel trails
+tgtFld = "surface"
+tgtAttrib = 'gravel'
+
 with arcpy.da.SearchCursor(
         in_table = trails,
         field_names = tgtFld,
-        where_clause = (tgtFld == tgtAttrib)
+        where_clause = f"{tgtFld} = '{tgtAttrib}'"
         ) as cursor:
     print ("Checking fields...")
 

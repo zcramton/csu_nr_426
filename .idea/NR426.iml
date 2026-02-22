@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/NR426_GlobalMapProject/Index/NR426_GlobalMapProject_index/Connections" />
       <excludeFolder url="file://$MODULE_DIR$/NR426_GlobalMapProject/RasterFunctionTemplates" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.11 (NR426)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.13 (csu_nr_426)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
