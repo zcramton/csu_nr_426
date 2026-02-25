@@ -28,7 +28,7 @@ arcpy.management.AddField(
 print ("...updating geometry attributes...\n")
 arcpy.management.CalculateGeometryAttributes(
     in_features = statesshp,
-    geometry_property = "MaxY EXTENT_MAX_Y"
+    geometry_property = "EXTENT_MAX_Y"
 )
 #Use cursor to read values in table and return the state with the highest value,
 #but only for the lower 48 states
