@@ -13,7 +13,7 @@ import arcpy
 
 #Set environments and variables
 #Set path to your copy of US_states.shp
-path = r"Lesson5\L5LabData\US_states.shp"
+path = r"L5LabData"
 arcpy.env.workspace = path
 
 statesshp = "US_states.shp"
@@ -42,5 +42,7 @@ with arcpy.da.SearchCursor(statesshp, [MaxYfld, "STATE_NAME"], lower48sql) as cu
 print (f"The state containing the northernmost point in the lower 48 is: {state_name} with a latitude of {theMaxYvalue}.")
 
 # Add:
-# Formatting and expanding print statements
+# Formatting and expanding print statements.
 # Try except statements (check slides), try one big statement with specific raised errors.
+# Ensure correct data formatting with dsc, exit if it is incorrect.
+# Look at geospatial centroid vibe coding lecture
