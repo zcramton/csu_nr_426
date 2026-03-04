@@ -88,7 +88,7 @@ try:
         in_features=statesshp,
         geometry_property=[[MaxYfld, "EXTENT_MAX_Y"]]
     )
-    print(f"[OK]   '{MaxYfld}' populated with EXTENT_MAX_Y values.")
+    print(f"\t'{MaxYfld}' populated with EXTENT_MAX_Y values.")
 
 
     #Use cursor to read values in table and return the state with the highest value,
