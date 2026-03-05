@@ -21,6 +21,8 @@ Parameters:
     1 - Output FC path
     2 - Number of features to randomly select (int > 0)
     3 - Significance threshold as whole % 1-99 (default 50)
+
+If viewing on GitHub, reference the photos in the Lesson6 directory for toolbox setup help.
 """
 
 # Import modules.
