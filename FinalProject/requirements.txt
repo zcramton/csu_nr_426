@@ -62,11 +62,3 @@
 #
 # An active ArcGIS Online portal sign-in with Living Atlas access
 # is required to use these services.
-
-
-# ============================================================
-# TESTING STATUS
-# ============================================================
-# Nothing in this tool has been tested end-to-end against live data.
-# See the Testing Status section in README.md for a full breakdown
-# of what has and has not been verified.

@@ -1,25 +1,24 @@
 # Beaver Conflict & Restoration Analysis
 
 Spatial screening tool for human-beaver conflict risk and restoration
-opportunity. Intersects BRAT stream network capacity with NLCD land cover
-to score each stream segment, then summarizes results by planning boundary
-(county, watershed, or custom AOI).
+opportunity. Intersects BRAT stream network capacity with NLCD land cover and 
+factional impervious surface to score each stream segment, then summarizes results 
+by planning boundary (state/county/municipality), watershed, or custom AOI).
 
 All NLCD inputs default to ESRI Living Atlas image services. The analysis
 boundary and output folder are the only inputs with no default.
 
 The boundary layer drives the analysis extent and planning unit attribution.
-Provide whatever polygon layer is relevant to your use case — pre-clipped
-to your area of interest. No state filtering is applied; if you want Colorado
-counties, bring Colorado counties.
+Provide whatever polygon layer is relevant to your use case pre-clipped
+to your area of interest.
 
 Fractional impervious surface (FIS) and land cover confidence are optional
 — both default to their Living Atlas services but can be disabled by
-setting the parameter to `""`.
+setting the parameter to `""`. - DOTHIS:: Resolve "Optional but really required"
 
 **Course:** CSU NR426 — Programming for GIS 1  
-**Author:** Zachary Cramton
-
+**Author:** Zachary Cramton\
+**Date:** 16 March 2026
 ---
 
 ## Files
@@ -38,17 +37,26 @@ Both Python files must be in the same directory.
 
 ## Requirements
 
-- ArcGIS Pro 3.6.2
+- ArcGIS Pro (Recommended: v3.6.2)
 - Spatial Analyst extension (required — checked at runtime)
 - Python 3.13 via the ArcGIS Pro conda environment (arcgispro-py3)
-- Active ArcGIS Online portal sign-in with Living Atlas access when using default service URLs
+- Active ArcGIS portal sign-in with Living Atlas access when using default service URLs
 
 ---
+## Instructions
 
-## Setup
+This program is intended to be run as a custom script tool in ArcGIS Pro or independently with the ArcGIS Pro
+interpreter in an IDE. 
 
-Open `CramtonZ_NR426_BeaverConflict.py` and fill in the **TOOL PARAMETERS**
-block near the top:
+### Setup
+For user inputs through the script tool GUI use arcpy.GetParameterAsText() and follow 
+the [instrucitons](https://pro.arcgis.com/en/pro-app/latest/help/analysis/geoprocessing/basics/create-a-python-script-tool.htm)
+from ESRI's help page to set up the tool. To set up or make changes to the inputs open `CramtonZ_NR426_BeaverConflict.py` 
+and fill in the **TOOL PARAMETERS** block near the top with your desired paths.
+
+This program will generate a file geodatabase and a text report. This script will overwrite these files each 
+time it runs. To save your files, move them to another directory or change these file names at the top of the
+**CONSTANTS** block below **TOOL PARAMETERS**.
 
 ```python
 # Required — no defaults
@@ -65,6 +73,10 @@ impervious_raster = ""   # defaults to USA NLCD Annual Fractional Impervious Sur
 confidence_raster = ""   # defaults to USA NLCD Annual Land Cover Confidence
 raw_ex_field      = ""   # defaults to oCC_EX
 raw_hpe_field     = ""   # defaults to oCC_PT
+
+# Optional - Change report names
+report_name = "BeaverConflictAnalysisReport.txt"
+OUTPUT_GDB_NAME = "BeaverConflictAnalysis.gdb"
 ```
 
 Living Atlas services require signing in to the active portal in ArcGIS Pro
@@ -72,7 +84,9 @@ before running.
 
 ---
 
-## How To Run
+### How To Run
+
+As a custom script tool, simply open and fill out the tool in the toolbox where you set it up.
 
 From the ArcGIS Pro Python window:
 ```python
@@ -105,7 +119,7 @@ and re-run.
 | `raw_ex_field` | Existing capacity field name (optional) | Defaults to `oCC_EX`; set if your BRAT layer differs |
 | `raw_hpe_field` | Historic/potential capacity field name (optional) | Defaults to `oCC_PT`; set if your BRAT layer differs |
 
-**boundary_type common values:** `"County"`, `"HUC-8 Watershed"`, `"HUC-12 Watershed"`, `"State"`, `"Custom AOI"`
+**boundary_type common values:**  `"State"`, `"County"`, `"HUC-8 Watershed"`, `"HUC-12 Watershed"`, `"Custom AOI"`
 
 ### Boundary Layer
 Provide any polygon layer clipped to your area of interest. The tool does
@@ -120,11 +134,13 @@ The tool validates the boundary layer before running:
 - Must spatially overlap the BRAT layer extent
 
 ### NLCD Projection Note
-When using a **local raster**, NLCD must be in **EPSG 5070 (Conus Albers)** — the
-script checks this at startup and exits if it doesn't match. Reproject with
-Project Raster (WKID 5070) before running. This check is necessary because
-`arcpy.management.Clip` writes the clipped output in the file's native SR, so a
-mismatch causes the raster and buffer polygons to silently misalign in zonal statistics.
+When using a **local raster**, NLCD must be in **EPSG 5070 (Conus Albers)**. The
+script checks this at startup and exits if it doesn't match. Reproject with Project Raster 
+(WKID 5070) before running. To avoid unknowingly modifying user input data
+or raster projection complications, this is not automated and local files must be projected
+by the user. Reference the ESRI [help page](https://pro.arcgis.com/en/pro-app/3.4/tool-reference/data-management/project-raster.htm)
+for more information about Project Raster. This check is necessary because `arcpy.management.Clip` writes the clipped output in the file's native SR, so a mismatch causes the raster and buffer 
+polygons to silently misalign in zonal statistics.
 
 When using a **Living Atlas image service URL**, the projection check is skipped.
 `arcpy.management.Clip` writes the clipped output using `arcpy.env.outputCoordinateSystem`
@@ -134,7 +150,7 @@ service's native projection. Checking the service SR would produce a false error
 ### Default Data Sources
 
 All Living Atlas URLs below are confirmed correct but have not yet been
-tested end-to-end in the tool. Boundary REST URLs are unverified — confirm
+tested end-to-end in the tool. Boundary REST URLs are unverified. DOTHIS:: confirm
 each before use.
 
 | Input | URL | Status |
@@ -261,13 +277,13 @@ This tool is a **spatial screening index**, not a hydraulic model.
 - FIS scaling improves precision within developed classes but does not
   capture non-impervious development pressures (e.g. agriculture, logging)
 - LC confidence flag identifies uncertain classifications but does not
-  correct them — treat flagged segments as candidates for field verification
+  correct them — treat flagged segments as primary candidates for field verification
 - No DEM flood routing — does not model actual inundation extent
 - Validate with field data before using results in planning decisions
 
 ---
 
-## Testing Status
+# Testing Status
 
 Nothing in this tool has been tested end-to-end against live data. The
 table below tracks what has and hasn't been verified. Update this section
