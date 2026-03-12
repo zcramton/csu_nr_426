@@ -4,32 +4,27 @@
 # Zachary Cramton
 # ============================================================
 
+
 # ============================================================
 # CORE DEPENDENCY
 # ============================================================
 # arcpy ships with ArcGIS Pro and is NOT pip-installable.
-# This tool requires ArcGIS Pro 3.x with the Spatial Analyst extension.
+# This tool requires ArcGIS Pro with the Spatial Analyst extension.
 #
-# To verify your environment from the ArcGIS Pro Python window:
+# Developed on: ArcGIS Pro 3.6.2
+#
+# To verify your version from the ArcGIS Pro Python window:
 #   import arcpy
 #   print(arcpy.GetInstallInfo()["Version"])
-#
-# Minimum tested: ArcGIS Pro 3.1
-# Recommended:    ArcGIS Pro 3.2+
-#
-# arcpy >= 3.1   (installed with ArcGIS Pro — do not pip install)
 
 
 # ============================================================
 # PYTHON VERSION
 # ============================================================
-# ArcGIS Pro 3.x ships with Python 3.9 via the arcgispro-py3 conda env.
-# This tool requires Python 3.8+ (uses f-strings and type hints).
+# ArcGIS Pro 3.6 ships with Python 3.13 via the arcgispro-py3 conda env.
 #
-# To check:
+# To verify:
 #   python --version
-#
-# python >= 3.9
 
 
 # ============================================================
@@ -41,7 +36,8 @@
 #   arcpy.sa.Float
 #   arcpy.sa.RemapValue
 #
-# Run validate.py to confirm the extension is available before analysis.
+# The tool checks extension availability at startup and exits
+# with a message if it is not available.
 
 
 # ============================================================
@@ -55,29 +51,22 @@
 # ============================================================
 # INTERNET ACCESS
 # ============================================================
-# Required only when using REST service URLs for boundary_fc or nlcd_raster.
+# Required when using Living Atlas image service URLs for NLCD,
+# FIS, or confidence inputs, or the default CO BRAT feature service.
 # Not required if all inputs are local file paths.
 #
-# Services used:
-#   Census TIGER  : tigerweb.geo.census.gov
-#   USGS WBD      : hydro.nationalmap.gov
-#   MRLC NLCD WCS : dmsdata.cr.usgs.gov
+# Default services used:
+#   CO BRAT        : services1.arcgis.com
+#   NLCD / FIS /
+#   Confidence     : di-nlcd.img.arcgis.com
+#
+# An active ArcGIS Online portal sign-in with Living Atlas access
+# is required to use these services.
 
 
 # ============================================================
-# OPTIONAL: NON-ESRI PORTING DEPENDENCIES
+# TESTING STATUS
 # ============================================================
-# When porting analysis.py to a non-ESRI backend, install these
-# in place of arcpy:
-#
-#   geopandas >= 0.14
-#   rasterio >= 1.3
-#   rasterstats >= 0.19
-#   numpy >= 1.24
-#   pandas >= 2.0
-#
-# Install via ArcGIS Pro conda:
-#   conda install -c conda-forge geopandas rasterio rasterstats
-#
-# Or via pip in a standalone environment:
-#   pip install geopandas rasterio rasterstats numpy pandas
+# Nothing in this tool has been tested end-to-end against live data.
+# See the Testing Status section in README.md for a full breakdown
+# of what has and has not been verified.
