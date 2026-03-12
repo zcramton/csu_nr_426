@@ -38,16 +38,17 @@ Both Python files must be in the same directory.
 
 ## Requirements
 
-- ArcGIS Pro 3.x
+- ArcGIS Pro 3.6.2
 - Spatial Analyst extension (required — checked at runtime)
-- Python 3.9 via the ArcGIS Pro conda environment
-- Internet access only if using REST/Living Atlas URLs as inputs
+- Python 3.13 via the ArcGIS Pro conda environment (arcgispro-py3)
+- Active ArcGIS Online portal sign-in with Living Atlas access when using default service URLs
 
 ---
 
 ## Setup
 
-Open `CramtonZ_NR426_BeaverConflict.py` and fill in the **TOOL PARAMETERS** block near the top:
+Open `CramtonZ_NR426_BeaverConflict.py` and fill in the **TOOL PARAMETERS**
+block near the top:
 
 ```python
 # Required — no defaults
@@ -55,20 +56,19 @@ boundary_fc   = r"C:\data\Colorado_Counties.shp"   # pre-clipped to your AOI
 output_dir    = r"C:\output\beaver_analysis"
 
 # Optional — defaults shown; set local path to override, "" to use default
-brat_fc       = ""   # defaults to CO Living Atlas BRAT
-boundary_type = "County"   # label for report: County, HUC-8 Watershed, HUC-12 Watershed, State, Custom AOI
-raw_buffer_m  = "100"
-raw_overwrite = "true"
+brat_fc           = ""   # defaults to CO Living Atlas BRAT
+boundary_type     = "County"   # County, HUC-8 Watershed, HUC-12 Watershed, State, Custom AOI
+raw_buffer_m      = "100"
+raw_overwrite     = "true"
 nlcd_raster       = ""   # defaults to USA NLCD Annual Land Cover
 impervious_raster = ""   # defaults to USA NLCD Annual Fractional Impervious Surface
 confidence_raster = ""   # defaults to USA NLCD Annual Land Cover Confidence
+raw_ex_field      = ""   # defaults to oCC_EX
+raw_hpe_field     = ""   # defaults to oCC_PT
 ```
 
-Living Atlas services require an ArcGIS Online account with Living Atlas
-access. Sign in to the active portal in ArcGIS Pro before running.
-
-To migrate to a .pyt script tool, replace each value with the matching
-`arcpy.GetParameterAsText(N)` call shown in the inline comments.
+Living Atlas services require signing in to the active portal in ArcGIS Pro
+before running.
 
 ---
 
@@ -79,13 +79,13 @@ From the ArcGIS Pro Python window:
 exec(open(r"C:\path\to\CramtonZ_NR426_BeaverConflict.py").read())
 ```
 
-Or from any Python environment with arcpy:
+Or from any Python environment with arcpy on the path:
 ```
 python CramtonZ_NR426_BeaverConflict.py
 ```
 
-The script validates all inputs before running. Fix any reported errors,
-then re-run.
+The script validates all inputs before running. Fix any reported errors
+and re-run.
 
 ---
 
@@ -114,6 +114,11 @@ gets analyzed. Each polygon in the boundary layer becomes one planning unit
 in `planning_summary`, and each stream segment in `conflict_risk` and
 `restoration_opp` is tagged with the name of the boundary unit it falls in.
 
+The tool validates the boundary layer before running:
+- Must be Polygon geometry (not Polyline or Point)
+- Must contain at least one feature
+- Must spatially overlap the BRAT layer extent
+
 ### NLCD Projection Note
 When using a **local raster**, NLCD must be in **EPSG 5070 (Conus Albers)** — the
 script checks this at startup and exits if it doesn't match. Reproject with
@@ -128,36 +133,24 @@ service's native projection. Checking the service SR would produce a false error
 
 ### Default Data Sources
 
-| Input | Default URL |
-|---|---|
-| BRAT (Colorado) | `https://services1.arcgis.com/KNdRU5cN6ENqCTjk/arcgis/rest/services/Legend_Test1/FeatureServer` |
-| NLCD Land Cover | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover/ImageServer` |
-| FIS | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Fractional_Impervious_Surface/ImageServer` |
-| Confidence | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Confidence/ImageServer` |
+All Living Atlas URLs below are confirmed correct but have not yet been
+tested end-to-end in the tool. Boundary REST URLs are unverified — confirm
+each before use.
 
-### Boundary Input Checks
-The tool validates the boundary layer before running:
-- Must be Polygon geometry (not Polyline or Point)
-- Must contain at least one feature
-- Must spatially overlap the BRAT layer extent
+| Input | URL | Status |
+|---|---|---|
+| BRAT (Colorado) | `https://services1.arcgis.com/KNdRU5cN6ENqCTjk/arcgis/rest/services/Legend_Test1/FeatureServer` | URL confirmed, untested in tool |
+| NLCD Land Cover | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover/ImageServer` | URL confirmed, untested in tool |
+| FIS | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Fractional_Impervious_Surface/ImageServer` | URL confirmed, untested in tool |
+| Confidence | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Confidence/ImageServer` | URL confirmed, untested in tool |
+| Census Counties | `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1` | Unverified |
+| HUC-8 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4` | Unverified |
+| HUC-12 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6` | Unverified |
 
 ### BRAT Data Sources
-No single national BRAT layer exists — obtain data for your region:
 - **Colorado (default)**: Living Atlas — see `DEFAULT_BRAT_URL` in Constants block
-- **Colorado (download)**: CNHP — https://cnhp.colostate.edu
-- **Utah / general**: Utah State BRAT — https://brat.riverscapes.net
-
-If your BRAT layer uses different field names, set `raw_ex_field` and/or
-`raw_hpe_field` in the Tool Parameters block. Defaults are `oCC_EX` and `oCC_PT`
-(CO BRAT / COBAM).
-
-### Boundary Layer REST Defaults
-
-| Type | URL |
-|---|---|
-| Census Counties | `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1` |
-| HUC-8 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4` |
-| HUC-12 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6` |
+- **Other regions**: No additional sources have been tested. Field names may
+  differ — use `raw_ex_field` and `raw_hpe_field` to override defaults.
 
 ---
 
@@ -265,7 +258,51 @@ This tool is a **spatial screening index**, not a hydraulic model.
 
 - BRAT capacity is modeled potential, not confirmed beaver presence
 - NLCD 30m resolution may miss fine-scale land use variation
-- FIS scaling improves precision within developed classes but does not capture non-impervious development pressures (e.g. agriculture, logging)
-- LC confidence flag identifies uncertain classifications but does not correct them — treat flagged segments as candidates for field verification
+- FIS scaling improves precision within developed classes but does not
+  capture non-impervious development pressures (e.g. agriculture, logging)
+- LC confidence flag identifies uncertain classifications but does not
+  correct them — treat flagged segments as candidates for field verification
 - No DEM flood routing — does not model actual inundation extent
 - Validate with field data before using results in planning decisions
+
+---
+
+## Testing Status
+
+Nothing in this tool has been tested end-to-end against live data. The
+table below tracks what has and hasn't been verified. Update this section
+as testing is completed.
+
+### Data Sources
+
+| Item | Status |
+|---|---|
+| CO BRAT Living Atlas URL | URL confirmed, untested in tool |
+| NLCD Land Cover Living Atlas URL | URL confirmed, untested in tool |
+| FIS Living Atlas URL | URL confirmed, untested in tool |
+| LC Confidence Living Atlas URL | URL confirmed, untested in tool |
+| Census TIGER Counties REST URL | Unverified |
+| USGS HUC-8 REST URL | Unverified |
+| USGS HUC-12 REST URL | Unverified |
+
+### Analysis Parameters
+
+| Item | Status |
+|---|---|
+| NLCD dev weights (0.2 / 0.4 / 0.7 / 1.0) | Design decision — ecological validity unverified |
+| LC confidence threshold (75%) | Design decision — not empirically validated |
+| Default riparian buffer (100m) | Design decision — ecological appropriateness unverified |
+| FIS scaling on non-developed pixels | Correct by design — untested in practice |
+
+### Tool Behavior
+
+| Item | Status |
+|---|---|
+| End-to-end run against live data | Untested |
+| BRAT clip produces expected features | Untested |
+| NLCD clip and zonal statistics alignment | Untested |
+| Per-segment boundary attribution | Untested |
+| `HAVE_THEIR_CENTER_IN` → `INTERSECT` fallback | Untested |
+| `detect_name_field()` against real boundary layers | Untested |
+| Planning summary aggregation | Untested |
+| Report output formatting | Untested |
