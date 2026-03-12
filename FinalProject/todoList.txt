@@ -1,0 +1,15 @@
+# ============================================================
+# todoList.txt
+# Beaver Conflict & Restoration Analysis
+# Zachary Cramton
+# ============================================================
+
+# Review README.md
+    - Complete DOTHIS
+    - Validate default data sources
+    - Update/delete Testing Status section with progress
+
+# Final Deliverables
+    - Write-Up/Video (Maybe beneficial to do a video or screenshots showing script tool setup)
+    - Map(s) using Larimer CO &/or City of Fort Collins
+    - Zipped files

@@ -101,6 +101,7 @@ raw_hpe_field = arcpy.GetParameterAsText(10)      # Historic/potential capacity 
 # CONSTANTS
 # ============================================================
 
+report_name = "BeaverConflictAnalysisReport.txt"
 OUTPUT_GDB_NAME = "BeaverConflictAnalysis.gdb"
 OUTPUT_SR_WKID  = 5070   # EPSG 5070 Conus Albers — matches NLCD native projection
 
@@ -276,9 +277,8 @@ print("\t> All inputs verified.\n")
 # REPORT SETUP
 # ============================================================
 
-report_name = "CramtonZ_BeaverConflict_Report.txt"
 report_path = os.path.join(output_dir, report_name)
-timestamp   = datetime.datetime.now().strftime("%d%b%Y %H:%M:%S").upper()
+timestamp   = datetime.datetime.now().strftime("%d%b%Y").upper()
 
 
 # ============================================================
