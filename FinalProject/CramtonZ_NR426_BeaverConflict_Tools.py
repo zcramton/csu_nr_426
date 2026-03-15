@@ -25,6 +25,8 @@ OUTPUT_LAYERS = {
     "brat_clipped":     "brat_clipped",
     "brat_buffer":      "brat_riparian_buffer",
     "nlcd_clipped":     "nlcd_clipped",
+    "fis_clipped":      "fis_clipped",
+    "confidence_clipped": "confidence_clipped",
     "conflict_risk":    "conflict_risk",
     "restoration_opp":  "restoration_opp",
     "planning_summary": "planning_summary",
@@ -68,15 +70,21 @@ def clip_and_buffer_brat(brat_path, boundary_path, buffer_dist, output_gdb):
     Returns (clipped_path, buffer_path) or (None, None) on failure.
     """
     try:
+        # Create feature layers from both inputs before clipping.
+        # arcpy.analysis.Clip cannot clip one REST service URL directly against another —
+        # at least one input must be a local layer object.
+        make_layer(brat_path, "brat_lyr_clip")
+        make_layer(boundary_path, "boundary_lyr_clip")
+
         brat_clip = os.path.join(output_gdb, OUTPUT_LAYERS["brat_clipped"])
-        arcpy.analysis.Clip(brat_path, boundary_path, brat_clip)
+        arcpy.analysis.Clip("brat_lyr_clip", "boundary_lyr_clip", brat_clip)
 
         clip_count = int(arcpy.management.GetCount(brat_clip)[0])
         if clip_count == 0:
-            print(f"\t> ERROR: BRAT clip produced zero features.")
-            print(f"\t> Verify BRAT overlaps the boundary layer.")
+            arcpy.AddError("BRAT clip produced zero features.")
+            arcpy.AddError("Verify BRAT overlaps the boundary layer.")
             return None, None
-        print(f"\t> Clipped BRAT: {clip_count} segment(s)")
+        arcpy.AddMessage(f"\t> Clipped BRAT: {clip_count} segment(s)")
 
         brat_buffer = os.path.join(output_gdb, OUTPUT_LAYERS["brat_buffer"])
         arcpy.analysis.Buffer(
@@ -85,14 +93,14 @@ def clip_and_buffer_brat(brat_path, boundary_path, buffer_dist, output_gdb):
             buffer_distance_or_field=f"{buffer_dist} Meters",
             dissolve_option="NONE",
         )
-        print(f"\t> Riparian buffer ({buffer_dist}m): {clip_count} corridor polygon(s)")
+        arcpy.AddMessage(f"\t> Riparian buffer ({buffer_dist}m): {clip_count} corridor polygon(s)")
         return brat_clip, brat_buffer
 
     except arcpy.ExecuteError:
-        print(f"\t> ERROR in clip_and_buffer_brat:\n{arcpy.GetMessages(2)}")
+        arcpy.AddError(f"ERROR in clip_and_buffer_brat:\n{arcpy.GetMessages(2)}")
         return None, None
     except Exception as e:
-        print(f"\t> ERROR in clip_and_buffer_brat: {e}")
+        arcpy.AddError(f"ERROR in clip_and_buffer_brat: {e}")
         return None, None
 
 
@@ -119,8 +127,8 @@ def clip_nlcd(nlcd_path, boundary_path, output_gdb):
 
         # Verify clip produced data — all-NoData raster would cause silent failures downstream
         if arcpy.Raster(nlcd_clip).maximum is None:
-            print(f"\t> ERROR: NLCD clip produced an all-NoData raster.")
-            print(f"\t> Verify NLCD covers your area of interest.")
+            arcpy.AddError("NLCD clip produced an all-NoData raster.")
+            arcpy.AddError("Verify NLCD covers your area of interest.")
             return None
 
         # Use saved raster path — not the temp layer — so env mask stays valid
@@ -128,18 +136,62 @@ def clip_nlcd(nlcd_path, boundary_path, output_gdb):
         arcpy.env.cellSize   = nlcd_clip
         arcpy.env.mask       = nlcd_clip
 
-        print(f"\t> NLCD clipped and set as snap raster")
+        arcpy.AddMessage("\t> NLCD clipped and set as snap raster")
         return nlcd_clip
 
     except arcpy.ExecuteError:
-        print(f"\t> ERROR in clip_nlcd:\n{arcpy.GetMessages(2)}")
+        arcpy.AddError(f"ERROR in clip_nlcd:\n{arcpy.GetMessages(2)}")
         return None
     except Exception as e:
-        print(f"\t> ERROR in clip_nlcd: {e}")
+        arcpy.AddError(f"ERROR in clip_nlcd: {e}")
         return None
     finally:
         if arcpy.Exists("boundary_lyr_nlcd"):
             arcpy.management.Delete("boundary_lyr_nlcd")
+
+
+def clip_ancillary_raster(raster_path, boundary_path, output_key, output_gdb):
+    """
+    Clips an ancillary raster (FIS or confidence) to the analysis boundary.
+    Unlike clip_nlcd, does not modify arcpy environment settings.
+    Returns the clipped raster path or None on failure.
+    """
+    try:
+        make_layer(boundary_path, "boundary_lyr_ancillary")
+
+        extent = arcpy.Describe("boundary_lyr_ancillary").extent
+        rect   = f"{extent.XMin} {extent.YMin} {extent.XMax} {extent.YMax}"
+
+        out_raster = os.path.join(output_gdb, OUTPUT_LAYERS[output_key])
+        arcpy.management.Clip(
+            in_raster=raster_path,
+            rectangle=rect,
+            out_raster=out_raster,
+            in_template_dataset="boundary_lyr_ancillary",
+            clipping_geometry="ClippingGeometry",
+            maintain_clipping_extent="NO_MAINTAIN_EXTENT",
+        )
+
+        if arcpy.Raster(out_raster).maximum is None:
+            arcpy.AddWarning(f"Ancillary raster clip ({output_key}) produced an all-NoData raster.")
+            arcpy.AddWarning("It will be skipped.")
+            return None
+
+        arcpy.AddMessage(f"	> {output_key} clipped")
+        return out_raster
+
+    except arcpy.ExecuteError:
+        arcpy.AddWarning(f"Could not clip {output_key}:
+{arcpy.GetMessages(2)}")
+        arcpy.AddWarning(f"{output_key} will be skipped.")
+        return None
+    except Exception as e:
+        arcpy.AddWarning(f"Could not clip {output_key}: {e}")
+        arcpy.AddWarning(f"{output_key} will be skipped.")
+        return None
+    finally:
+        if arcpy.Exists("boundary_lyr_ancillary"):
+            arcpy.management.Delete("boundary_lyr_ancillary")
 
 
 def compute_conflict_risk(brat_buffer, ex_fld, nlcd_clip, boundary_path, output_gdb,
@@ -173,26 +225,28 @@ def compute_conflict_risk(brat_buffer, ex_fld, nlcd_clip, boundary_path, output_
         scored = [r[0] for r in arcpy.da.SearchCursor(out_fc, ["conflict_score_norm"])
                   if r[0] is not None]
         if not scored:
-            print(f"\t> Warning: All conflict_score_norm values are null.")
-            print(f"\t> Check that the riparian buffer overlaps the NLCD raster.")
+            arcpy.AddWarning("All conflict_score_norm values are null.")
+            arcpy.AddWarning("Check that the riparian buffer overlaps the NLCD raster.")
 
         # Land cover confidence — flag for review, does not affect index score
         if confidence_raster:
             zonal_mean_to_field(out_fc, arcpy.Raster(confidence_raster), "lc_confidence_mean")
             flag_lc_confidence(out_fc, "lc_confidence_mean")
-            print(f"\t> LC confidence flagged (threshold: {LC_CONFIDENCE_THRESHOLD}%)")
+            arcpy.AddMessage(f"\t> LC confidence flagged (threshold: {LC_CONFIDENCE_THRESHOLD}%)")
 
         # Tag each segment with its boundary unit name for downstream filtering
         tag_segments_with_boundary(out_fc, boundary_path)
 
-        print(f"\t> Conflict Risk Index: {int(arcpy.management.GetCount(out_fc)[0])} segments scored")
+        arcpy.AddMessage(
+            f"\t> Conflict Risk Index: {int(arcpy.management.GetCount(out_fc)[0])} segments scored"
+        )
         return out_fc
 
     except arcpy.ExecuteError:
-        print(f"\t> ERROR in compute_conflict_risk:\n{arcpy.GetMessages(2)}")
+        arcpy.AddError(f"ERROR in compute_conflict_risk:\n{arcpy.GetMessages(2)}")
         return None
     except Exception as e:
-        print(f"\t> ERROR in compute_conflict_risk: {e}")
+        arcpy.AddError(f"ERROR in compute_conflict_risk: {e}")
         return None
 
 
@@ -235,26 +289,29 @@ def compute_restoration_opp(brat_buffer, ex_fld, hpe_fld, nlcd_clip, boundary_pa
         scored = [r[0] for r in arcpy.da.SearchCursor(out_fc, ["restoration_score_norm"])
                   if r[0] is not None]
         if not scored:
-            print(f"\t> Warning: All restoration_score_norm values are null.")
-            print(f"\t> Check that the riparian buffer overlaps the NLCD raster.")
+            arcpy.AddWarning("All restoration_score_norm values are null.")
+            arcpy.AddWarning("Check that the riparian buffer overlaps the NLCD raster.")
 
         # Land cover confidence — flag for review, does not affect index score
         if confidence_raster:
             zonal_mean_to_field(out_fc, arcpy.Raster(confidence_raster), "lc_confidence_mean")
             flag_lc_confidence(out_fc, "lc_confidence_mean")
-            print(f"\t> LC confidence flagged (threshold: {LC_CONFIDENCE_THRESHOLD}%)")
+            arcpy.AddMessage(f"\t> LC confidence flagged (threshold: {LC_CONFIDENCE_THRESHOLD}%)")
 
         # Tag each segment with its boundary unit name for downstream filtering
         tag_segments_with_boundary(out_fc, boundary_path)
 
-        print(f"\t> Restoration Opportunity Index: {int(arcpy.management.GetCount(out_fc)[0])} segments scored")
+        arcpy.AddMessage(
+            f"\t> Restoration Opportunity Index: "
+            f"{int(arcpy.management.GetCount(out_fc)[0])} segments scored"
+        )
         return out_fc
 
     except arcpy.ExecuteError:
-        print(f"\t> ERROR in compute_restoration_opp:\n{arcpy.GetMessages(2)}")
+        arcpy.AddError(f"ERROR in compute_restoration_opp:\n{arcpy.GetMessages(2)}")
         return None
     except Exception as e:
-        print(f"\t> ERROR in compute_restoration_opp: {e}")
+        arcpy.AddError(f"ERROR in compute_restoration_opp: {e}")
         return None
 
 
@@ -278,24 +335,24 @@ def compute_planning_summary(boundary_path, conflict_fc, restoration_fc, output_
 
         unit_count = int(arcpy.management.GetCount(out_fc)[0])
         if unit_count == 0:
-            print(f"\t> Warning: Planning summary has zero boundary units.")
-            print(f"\t> Verify the boundary layer overlaps the BRAT data.")
+            arcpy.AddWarning("Planning summary has zero boundary units.")
+            arcpy.AddWarning("Verify the boundary layer overlaps the BRAT data.")
         else:
-            print(f"\t> Planning Summary: {unit_count} boundary unit(s)")
+            arcpy.AddMessage(f"\t> Planning Summary: {unit_count} boundary unit(s)")
         return out_fc
 
     except arcpy.ExecuteError:
-        print(f"\t> ERROR in compute_planning_summary:\n{arcpy.GetMessages(2)}")
+        arcpy.AddError(f"ERROR in compute_planning_summary:\n{arcpy.GetMessages(2)}")
         return None
     except Exception as e:
-        print(f"\t> ERROR in compute_planning_summary: {e}")
+        arcpy.AddError(f"ERROR in compute_planning_summary: {e}")
         return None
 
 
 def print_summary(summary_fc, bnd_type, report_file=None):
     """
     Prints a ranked summary table sorted by conflict score descending.
-    Writes to console and to report_file simultaneously if provided.
+    Writes to the ArcGIS Pro messages panel and to report_file simultaneously.
     Capped at SUMMARY_MAX_ROWS rows.
     """
     name_field   = detect_name_field(summary_fc)
@@ -352,10 +409,10 @@ def print_summary(summary_fc, bnd_type, report_file=None):
     )
 
     for line in lines:
-        print(line)
+        arcpy.AddMessage(line)
         if report_file:
             print(line, file=report_file)
-    print()
+    arcpy.AddMessage("")
     if report_file:
         print("", file=report_file)
 
@@ -380,9 +437,9 @@ def tag_segments_with_boundary(fc, boundary_path):
     """
     name_field = detect_name_field(boundary_path)
     if not name_field:
-        print(f"\t> Warning: No recognizable name field found in boundary layer.")
-        print(f"\t> Segments will not be tagged with boundary unit names.")
-        print(f"\t> Add your name field to detect_name_field() candidates if needed.")
+        arcpy.AddWarning("No recognizable name field found in boundary layer.")
+        arcpy.AddWarning("Segments will not be tagged with boundary unit names.")
+        arcpy.AddWarning("Add your name field to detect_name_field() candidates if needed.")
         return
 
     fm   = arcpy.FieldMappings()
@@ -428,7 +485,7 @@ def tag_segments_with_boundary(fc, boundary_path):
     add_field_if_missing(fc, "boundary_name", "TEXT", field_length=100)
     arcpy.management.JoinField(fc, "OBJECTID", tmp, "TARGET_FID", ["boundary_name"])
     arcpy.management.Delete(tmp)
-    print(f"\t> Segments tagged with boundary unit name from '{name_field}'")
+    arcpy.AddMessage(f"\t> Segments tagged with boundary unit name from '{name_field}'")
 
 
 def reclassify_nlcd_dev_weight(nlcd_raster_path, impervious_raster=None):
@@ -450,7 +507,7 @@ def reclassify_nlcd_dev_weight(nlcd_raster_path, impervious_raster=None):
         # Non-developed pixels have a base weight of 0.0, so FIS has no effect on them.
         fis           = arcpy.sa.Float(arcpy.Raster(impervious_raster)) / 100.0
         weight_raster = weight_raster * fis
-        print(f"\t> FIS applied: dev weights scaled by fractional imperviousness")
+        arcpy.AddMessage("\t> FIS applied: dev weights scaled by fractional imperviousness")
 
     return weight_raster
 
@@ -494,8 +551,8 @@ def zonal_mean_to_field(fc, value_raster, out_field):
     )
 
     if int(arcpy.management.GetCount(zonal_tbl)[0]) == 0:
-        print(f"\t> Warning: Zonal statistics for '{out_field}' produced no results.")
-        print(f"\t> Verify the riparian buffer overlaps the NLCD raster extent.")
+        arcpy.AddWarning(f"Zonal statistics for '{out_field}' produced no results.")
+        arcpy.AddWarning("Verify the riparian buffer overlaps the NLCD raster extent.")
         arcpy.management.Delete(zonal_tbl)
         return
 
