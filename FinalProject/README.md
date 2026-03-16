@@ -26,12 +26,12 @@ setting the parameter to `""`.
 
 ```
 FinalProject/
-├── CramtonZ_NR426_BeaverConflict.py        # Entry point — set parameters and run (if using IDE)
+├── CramtonZ_NR426_BeaverConflict.py        # Entry point — set parameters and run
 ├── CramtonZ_NR426_BeaverConflict_Tools.py  # All functions and shared constants
 ├── README.md
 ├── requirements.txt
 ├── Media/
-│   └── parameter_setup.png
+│   └── tbScript_ParameterSetup.png
 └── Data/
     ├── BeaverConflictAnalysis.gdb
     └── LarimerCountyBnd.shp
@@ -107,7 +107,7 @@ From the ArcGIS Pro Python window:
 exec(open(r"C:\path\to\CramtonZ_NR426_BeaverConflict.py").read())
 ```
 
-Or from any Python environment with ArcPy on the path:
+Or from any Python environment with arcpy on the path:
 ```
 python CramtonZ_NR426_BeaverConflict.py
 ```
@@ -119,19 +119,19 @@ and re-run.
 
 ## Inputs
 
-| #  | Parameter           | Description                                       | Notes                                                        |
-|----|---------------------|---------------------------------------------------|--------------------------------------------------------------|
-| 0  | `output_dir`        | Output folder                                     | Created if it doesn't exist — **required**                   |
-| 1  | `boundary_fc`       | Analysis boundary polygon                         | Pre-clipped to your AOI — **required**                       |
-| 2  | `boundary_type`     | Label for boundary type                           | Used in report only — see common values below                |
-| 3  | `brat_fc`           | BRAT polyline                                     | Defaults to CO Living Atlas; must have `oCC_EX` and `oCC_PT` |
-| 4  | `raw_ex_field`      | Existing capacity field name (optional)           | Defaults to `oCC_EX`; set if your BRAT layer differs         |
-| 5  | `raw_hpe_field`     | Historic/potential capacity field name (optional) | Defaults to `oCC_PT`; set if your BRAT layer differs         |
-| 6  | `nlcd_raster`       | NLCD land cover raster or URL                     | Defaults to Living Atlas image service                       |
-| 7  | `impervious_raster` | FIS raster or URL (optional)                      | Defaults to Living Atlas; `""` to skip FIS scaling           |
-| 8  | `confidence_raster` | Confidence raster or URL (optional)               | Defaults to Living Atlas; `""` to skip confidence flagging   |
-| 9  | `raw_buffer_m`      | Riparian buffer in meters                         | Default 100m; must be > 0                                    |
-| 10 | `raw_overwrite`     | Overwrite outputs                                 | `"true"` or `"false"`                                        |
+| # | Parameter | Description | Notes |
+|---|---|---|---|
+| 0 | `output_dir` | Output folder | Created if it doesn't exist — **required** |
+| 1 | `boundary_fc` | Analysis boundary polygon | Pre-clipped to your AOI — **required** |
+| 2 | `boundary_type` | Label for boundary type | Used in report only — see common values below |
+| 3 | `brat_fc` | BRAT polyline | Defaults to CO Living Atlas; must have `oCC_EX` and `oCC_PT` |
+| 4 | `raw_ex_field` | Existing capacity field name (optional) | Defaults to `oCC_EX`; set if your BRAT layer differs |
+| 5 | `raw_hpe_field` | Historic/potential capacity field name (optional) | Defaults to `oCC_PT`; set if your BRAT layer differs |
+| 6 | `nlcd_raster` | NLCD land cover raster or URL | Defaults to Living Atlas image service |
+| 7 | `impervious_raster` | FIS raster or URL (optional) | Defaults to Living Atlas; `""` to skip FIS scaling |
+| 8 | `confidence_raster` | Confidence raster or URL (optional) | Defaults to Living Atlas; `""` to skip confidence flagging |
+| 9 | `raw_buffer_m` | Riparian buffer in meters | Default 100m; must be > 0 |
+| 10 | `raw_overwrite` | Overwrite outputs | `"true"` or `"false"` |
 
 **boundary_type common values:** `"County"`, `"HUC-8 Watershed"`, `"HUC-12 Watershed"`, `"State"`, `"Custom AOI"`
 
@@ -165,15 +165,15 @@ All Living Atlas URLs below are confirmed correct but have not yet been
 tested end-to-end in the tool. Boundary REST URLs are unverified — confirm
 each before use.
 
-| Input             | URL                                                                                                                       | Status                                                                       |
-|-------------------|---------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| BRAT (Colorado)   | `https://services1.arcgis.com/KNdRU5cN6ENqCTjk/arcgis/rest/services/Legend_Test1/FeatureServer`                           | URL confirmed, resolves in tool                                              |
-| NLCD Land Cover   | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover/ImageServer`                               | URL confirmed, resolves in tool                                              |
-| FIS               | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Fractional_Impervious_Surface/ImageServer` | URL confirmed, resolves in tool — must be clipped to local raster before use |
-| Confidence        | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Confidence/ImageServer`                    | URL confirmed, resolves in tool                                              |
-| Census Counties   | `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1`                                  | Unverified                                                                   |
-| HUC-8 Watersheds  | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4`                                                      | Unverified                                                                   |
-| HUC-12 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6`                                                      | Unverified                                                                   |
+| Input | URL | Status |
+|---|---|---|
+| BRAT (Colorado) | `https://services1.arcgis.com/KNdRU5cN6ENqCTjk/arcgis/rest/services/Legend_Test1/FeatureServer` | URL confirmed, resolves in tool |
+| NLCD Land Cover | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover/ImageServer` | URL confirmed, resolves in tool |
+| FIS | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Fractional_Impervious_Surface/ImageServer` | URL confirmed, resolves in tool — must be clipped to local raster before use |
+| Confidence | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Confidence/ImageServer` | URL confirmed, resolves in tool |
+| Census Counties | `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1` | Unverified |
+| HUC-8 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4` | Unverified |
+| HUC-12 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6` | Unverified |
 
 ### BRAT Data Sources
 - **Colorado (default)**: Living Atlas — see `DEFAULT_BRAT_URL` in Constants block
@@ -187,43 +187,43 @@ each before use.
 All saved to `BeaverConflictAnalysis.gdb` in your output directory, plus
 a `CramtonZ_BeaverConflict_Report.txt` summary file.
 
-| Layer                  | Description                                                                       |
-|------------------------|-----------------------------------------------------------------------------------|
-| `brat_clipped`         | BRAT clipped to boundary                                                          |
-| `brat_riparian_buffer` | Segments buffered to riparian corridor                                            |
-| `nlcd_clipped`         | NLCD clipped to boundary                                                          |
-| `fis_clipped`          | FIS clipped to boundary; present only if `impervious_raster` is enabled           |
-| `confidence_clipped`   | LC confidence clipped to boundary; present only if `confidence_raster` is enabled |
-| `conflict_risk`        | Conflict Risk Index per stream segment                                            |
-| `restoration_opp`      | Restoration Opportunity Index per segment                                         |
-| `planning_summary`     | Mean scores per boundary unit                                                     |
+| Layer | Description |
+|---|---|
+| `brat_clipped` | BRAT clipped to boundary |
+| `brat_riparian_buffer` | Segments buffered to riparian corridor |
+| `nlcd_clipped` | NLCD clipped to boundary |
+| `fis_clipped` | FIS clipped to boundary; present only if `impervious_raster` is enabled |
+| `confidence_clipped` | LC confidence clipped to boundary; present only if `confidence_raster` is enabled |
+| `conflict_risk` | Conflict Risk Index per stream segment |
+| `restoration_opp` | Restoration Opportunity Index per segment |
+| `planning_summary` | Mean scores per boundary unit |
 
 ### Key Output Fields
 
 **conflict_risk**
 
-| Field                 | Description                                                                        |
-|-----------------------|------------------------------------------------------------------------------------|
-| `oCC_EX_norm`         | Existing capacity normalized 0–1                                                   |
-| `dev_weight_mean`     | Mean dev weight in riparian buffer (class weight × FIS if enabled)                 |
-| `conflict_score_norm` | Final conflict score (0–1)                                                         |
-| `conflict_class`      | Very Low / Low / Moderate / High / Very High                                       |
-| `lc_confidence_mean`  | Mean NLCD LC confidence in buffer (0–100); present if confidence enabled           |
-| `lc_confidence_flag`  | `OK` or `Review` based on `LC_CONFIDENCE_THRESHOLD`; present if confidence enabled |
-| `boundary_name`       | Name of the boundary unit each segment falls in (from boundary layer)              |
+| Field | Description |
+|---|---|
+| `oCC_EX_norm` | Existing capacity normalized 0–1 |
+| `dev_weight_mean` | Mean dev weight in riparian buffer (class weight × FIS if enabled) |
+| `conflict_score_norm` | Final conflict score (0–1) |
+| `conflict_class` | Very Low / Low / Moderate / High / Very High |
+| `lc_confidence_mean` | Mean NLCD LC confidence in buffer (0–100); present if confidence enabled |
+| `lc_confidence_flag` | `OK` or `Review` based on `LC_CONFIDENCE_THRESHOLD`; present if confidence enabled |
+| `boundary_name` | Name of the boundary unit each segment falls in (from boundary layer) |
 
 **restoration_opp**
 
-| Field                    | Description                                                                        |
-|--------------------------|------------------------------------------------------------------------------------|
-| `restoration_gap`        | oCC_PT minus oCC_EX, floored at 0                                                  |
-| `gap_norm`               | Restoration gap normalized 0–1                                                     |
-| `dev_weight_mean`        | Mean dev weight in riparian buffer (class weight × FIS if enabled)                 |
-| `restoration_score_norm` | Final restoration score (0–1)                                                      |
-| `restoration_class`      | Very Low / Low / Moderate / High / Very High                                       |
-| `lc_confidence_mean`     | Mean NLCD LC confidence in buffer (0–100); present if confidence enabled           |
-| `lc_confidence_flag`     | `OK` or `Review` based on `LC_CONFIDENCE_THRESHOLD`; present if confidence enabled |
-| `boundary_name`          | Name of the boundary unit each segment falls in (from boundary layer)              |
+| Field | Description |
+|---|---|
+| `restoration_gap` | oCC_PT minus oCC_EX, floored at 0 |
+| `gap_norm` | Restoration gap normalized 0–1 |
+| `dev_weight_mean` | Mean dev weight in riparian buffer (class weight × FIS if enabled) |
+| `restoration_score_norm` | Final restoration score (0–1) |
+| `restoration_class` | Very Low / Low / Moderate / High / Very High |
+| `lc_confidence_mean` | Mean NLCD LC confidence in buffer (0–100); present if confidence enabled |
+| `lc_confidence_flag` | `OK` or `Review` based on `LC_CONFIDENCE_THRESHOLD`; present if confidence enabled |
+| `boundary_name` | Name of the boundary unit each segment falls in (from boundary layer) |
 
 ---
 
@@ -262,22 +262,22 @@ the `SHARED CONSTANTS` block of the Tools file.
 
 **NLCD Development Weights**
 
-| Class      | Label                       | Weight |
-|------------|-----------------------------|--------|
-| 21         | Developed, Open Space       | 0.2    |
-| 22         | Developed, Low Intensity    | 0.4    |
-| 23         | Developed, Medium Intensity | 0.7    |
-| 24         | Developed, High Intensity   | 1.0    |
-| All others | Not developed               | 0.0    |
+| Class | Label | Weight |
+|---|---|---|
+| 21 | Developed, Open Space | 0.2 |
+| 22 | Developed, Low Intensity | 0.4 |
+| 23 | Developed, Medium Intensity | 0.7 |
+| 24 | Developed, High Intensity | 1.0 |
+| All others | Not developed | 0.0 |
 
 **Risk Classes** (applied to all normalized scores)
 
-| Score     | Class     |
-|-----------|-----------|
-| 0.0 – 0.2 | Very Low  |
-| 0.2 – 0.4 | Low       |
-| 0.4 – 0.6 | Moderate  |
-| 0.6 – 0.8 | High      |
+| Score | Class |
+|---|---|
+| 0.0 – 0.2 | Very Low |
+| 0.2 – 0.4 | Low |
+| 0.4 – 0.6 | Moderate |
+| 0.6 – 0.8 | High |
 | 0.8 – 1.0 | Very High |
 
 ---
@@ -305,41 +305,77 @@ as testing is completed.
 
 ### Data Sources
 
-| Item                             | Status                            |
-|----------------------------------|-----------------------------------|
-| CO BRAT Living Atlas URL         | Resolves and is queryable in tool |
-| NLCD Land Cover Living Atlas URL | Resolves in tool                  |
-| FIS Living Atlas URL             | Resolves in tool                  |
-| LC Confidence Living Atlas URL   | Resolves in tool                  |
-| Census TIGER Counties REST URL   | Unverified                        |
-| USGS HUC-8 REST URL              | Unverified                        |
-| USGS HUC-12 REST URL             | Unverified                        |
+| Item | Status |
+|---|---|
+| CO BRAT Living Atlas URL | Resolves and is queryable in tool |
+| NLCD Land Cover Living Atlas URL | Resolves in tool |
+| FIS Living Atlas URL | Resolves in tool |
+| LC Confidence Living Atlas URL | Resolves in tool |
+| Census TIGER Counties REST URL | Unverified |
+| USGS HUC-8 REST URL | Unverified |
+| USGS HUC-12 REST URL | Unverified |
 
 ### Analysis Parameters
 
-| Item                                     | Status                                                  |
-|------------------------------------------|---------------------------------------------------------|
-| NLCD dev weights (0.2 / 0.4 / 0.7 / 1.0) | Design decision — ecological validity unverified        |
-| LC confidence threshold (75%)            | Design decision — not empirically validated             |
-| Default riparian buffer (100m)           | Design decision — ecological appropriateness unverified |
-| FIS scaling on non-developed pixels      | Correct by design — untested in practice                |
+| Item | Status |
+|---|---|
+| NLCD dev weights (0.2 / 0.4 / 0.7 / 1.0) | Design decision — ecological validity unverified |
+| LC confidence threshold (75%) | Design decision — not empirically validated |
+| Default riparian buffer (100m) | Design decision — ecological appropriateness unverified |
+| FIS scaling on non-developed pixels | Correct by design — untested in practice |
 
 ### Tool Behavior
 
-| Item                                                   | Status                                    |
-|--------------------------------------------------------|-------------------------------------------|
-| End-to-end run against live data                       | Untested                                  |
-| Input validation (existence, geometry, fields, extent) | Passed — 15 Mar 2026                      |
-| BRAT field detection (oCC_EX, oCC_PT)                  | Passed — 15 Mar 2026                      |
-| Null geometry check                                    | Passed — 15 Mar 2026                      |
-| Extent overlap check (mixed SR)                        | Passed — 15 Mar 2026                      |
-| GDB creation                                           | Passed — 15 Mar 2026                      |
-| BRAT clip produces expected features                   | Passed — 15 Mar 2026 (1,001,622 segments) |
-| NLCD clip                                              | Passed — 15 Mar 2026                      |
-| FIS and confidence clip to local raster                | Fix applied 15 Mar 2026 — not yet re-run  |
-| Zonal statistics alignment                             | Untested                                  |
-| Per-segment boundary attribution                       | Untested                                  |
-| `HAVE_THEIR_CENTER_IN` → `INTERSECT` fallback          | Untested                                  |
-| `detect_name_field()` against real boundary layers     | Untested                                  |
-| Planning summary aggregation                           | Untested                                  |
-| Report output formatting                               | Untested                                  |
+| Item | Status |
+|---|---|
+| End-to-end run against live data | Untested |
+| Input validation (existence, geometry, fields, extent) | Passed — 15 Mar 2026 |
+| BRAT field detection (oCC_EX, oCC_PT) | Passed — 15 Mar 2026 |
+| Null geometry check | Passed — 15 Mar 2026 |
+| Extent overlap check (mixed SR) | Passed — 15 Mar 2026 |
+| GDB creation | Passed — 15 Mar 2026 |
+| BRAT clip produces expected features | Passed — 15 Mar 2026 (1,001,622 segments) |
+| NLCD clip | Passed — 15 Mar 2026 |
+| FIS and confidence clip to local raster | Fix applied 15 Mar 2026 — not yet re-run |
+| Zonal statistics alignment | Untested |
+| Per-segment boundary attribution | Untested |
+| `HAVE_THEIR_CENTER_IN` → `INTERSECT` fallback | Untested |
+| `detect_name_field()` against real boundary layers | Untested |
+| Planning summary aggregation | Untested |
+| Report output formatting | Untested |
+
+---
+
+## Data Sources
+
+| Dataset | Provider | Access |
+|---|---|---|
+| Colorado BRAT Stream Network | Colorado Natural Heritage Program (CNHP) | ArcGIS Living Atlas — `DEFAULT_BRAT_URL` in Constants block |
+| NLCD Annual Land Cover | Multi-Resolution Land Characteristics Consortium (MRLC) | ESRI Living Atlas ImageServer |
+| NLCD Fractional Impervious Surface | MRLC | ESRI Living Atlas ImageServer |
+| NLCD Land Cover Confidence | MRLC | ESRI Living Atlas ImageServer |
+| Larimer County Boundary | Colorado Department of Public Health and Environment (CDPHE) | `https://www.cohealthmaps.dphe.state.co.us/arcgis/rest/services/OPEN_DATA/cdphe_geographic_analysis_boundaries/MapServer/5` |
+
+---
+
+## Acknowledgements & References
+
+### Development Tools & AI Assistance
+This tool was developed with assistance from **Claude Sonnet 4.6** (Anthropic, 2026),
+used for debugging and Markdown formatting help as well as summarizing Python's PEP8 style guide for better form.
+
+### Programming References
+- **Python.org** — Python 3 language reference and standard library documentation.
+  https://docs.python.org/3/
+- **ArcGIS Pro Documentation** — arcpy function reference, geoprocessing tool syntax,
+  and script tool authoring guidance.
+  https://pro.arcgis.com/en/pro-app/latest/arcpy/main/arcgis-pro-arcpy-reference.htm
+- **GeeksforGeeks** — Python syntax examples and general programming guidance.
+  https://www.geeksforgeeks.org/
+- **W3Schools** — Python reference and code examples.
+  https://www.w3schools.com/python/
+
+### Conceptual Background
+- Macfarlane, W.W., et al. — Beaver Restoration Assessment Tool (BRAT):
+  a decision support and planning tool for beaver management.
+  Utah State University. https://brat.riverscapes.net
