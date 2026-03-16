@@ -181,8 +181,7 @@ def clip_ancillary_raster(raster_path, boundary_path, output_key, output_gdb):
         return out_raster
 
     except arcpy.ExecuteError:
-        arcpy.AddWarning(f"Could not clip {output_key}:
-{arcpy.GetMessages(2)}")
+        arcpy.AddWarning(f"Could not clip {output_key}: {arcpy.GetMessages(2)}")
         arcpy.AddWarning(f"{output_key} will be skipped.")
         return None
     except Exception as e:
@@ -641,12 +640,14 @@ def spatial_join_mean(target_fc, join_fc, score_field, class_field):
         match_option="INTERSECT",
     )
 
-    existing = {f.name for f in arcpy.ListFields(tmp)}
+    existing        = {f.name for f in arcpy.ListFields(tmp)}
+    target_existing = {f.name for f in arcpy.ListFields(target_fc)}
     for field in [score_field, class_field]:
         if field in existing:
-            ftype   = "TEXT" if "class" in field else "DOUBLE"
-            fkwargs = {"field_length": 20} if ftype == "TEXT" else {}
-            add_field_if_missing(target_fc, field, ftype, **fkwargs)
+            # Delete from target before joining — JoinField appends a duplicate
+            # if the field already exists rather than updating it in place.
+            if field in target_existing:
+                arcpy.management.DeleteField(target_fc, field)
             arcpy.management.JoinField(target_fc, "OBJECTID", tmp, "TARGET_FID", [field])
     arcpy.management.Delete(tmp)
 
@@ -668,7 +669,7 @@ def detect_name_field(fc):
     Returns the first recognizable name field found in fc, or None.
     Add field names here if your boundary layer uses a non-standard name field.
     """
-    candidates = ["NAME", "BASENAME", "NAMELSAD", "name", "huc8", "huc10",
-                  "huc12", "HUC_NAME", "UNIT_NAME", "WATERSHED"]
+    candidates = ["NAME", "BASENAME", "NAMELSAD", "FULL", "COUNTY", "LABEL",
+                  "name", "huc8", "huc10", "huc12", "HUC_NAME", "UNIT_NAME", "WATERSHED"]
     existing   = {f.name for f in arcpy.ListFields(fc)}
     return next((c for c in candidates if c in existing), None)
