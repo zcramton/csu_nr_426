@@ -34,7 +34,7 @@ FinalProject/
 │   └── tbScript_ParameterSetup.png
 └── Data/
     ├── BeaverConflictAnalysis.gdb
-    └── LarimerCountyBnd.shp
+    └── Boundaries.gdb
 ```
 
 Both Python files must be in the same directory.
@@ -294,55 +294,6 @@ This tool is a **spatial screening index**, not a hydraulic model.
   correct them — treat flagged segments as candidates for field verification
 - No DEM flood routing — does not model actual inundation extent
 - Validate with field data before using results in planning decisions
-
----
-
-## Testing Status
-
-Nothing in this tool has been tested end-to-end against live data. The
-table below tracks what has and hasn't been verified. Update this section
-as testing is completed.
-
-### Data Sources
-
-| Item | Status |
-|---|---|
-| CO BRAT Living Atlas URL | Resolves and is queryable in tool |
-| NLCD Land Cover Living Atlas URL | Resolves in tool |
-| FIS Living Atlas URL | Resolves in tool |
-| LC Confidence Living Atlas URL | Resolves in tool |
-| Census TIGER Counties REST URL | Unverified |
-| USGS HUC-8 REST URL | Unverified |
-| USGS HUC-12 REST URL | Unverified |
-
-### Analysis Parameters
-
-| Item | Status |
-|---|---|
-| NLCD dev weights (0.2 / 0.4 / 0.7 / 1.0) | Design decision — ecological validity unverified |
-| LC confidence threshold (75%) | Design decision — not empirically validated |
-| Default riparian buffer (100m) | Design decision — ecological appropriateness unverified |
-| FIS scaling on non-developed pixels | Correct by design — untested in practice |
-
-### Tool Behavior
-
-| Item | Status |
-|---|---|
-| End-to-end run against live data | Untested |
-| Input validation (existence, geometry, fields, extent) | Passed — 15 Mar 2026 |
-| BRAT field detection (oCC_EX, oCC_PT) | Passed — 15 Mar 2026 |
-| Null geometry check | Passed — 15 Mar 2026 |
-| Extent overlap check (mixed SR) | Passed — 15 Mar 2026 |
-| GDB creation | Passed — 15 Mar 2026 |
-| BRAT clip produces expected features | Passed — 15 Mar 2026 (1,001,622 segments) |
-| NLCD clip | Passed — 15 Mar 2026 |
-| FIS and confidence clip to local raster | Fix applied 15 Mar 2026 — not yet re-run |
-| Zonal statistics alignment | Untested |
-| Per-segment boundary attribution | Untested |
-| `HAVE_THEIR_CENTER_IN` → `INTERSECT` fallback | Untested |
-| `detect_name_field()` against real boundary layers | Untested |
-| Planning summary aggregation | Untested |
-| Report output formatting | Untested |
 
 ---
 

@@ -1,0 +1,33 @@
+============================================================
+NR426 Beaver Conflict & Restoration Analysis
+Generated: 15MAR2026 19:25:06
+Boundary: Colorado Counties: Larimer   |   Units: 1
+Buffer: 100m   |   Overwrite: True
+BRAT fields: oCC_EX (EX), oCC_PT (HPE)
+NLCD source:       https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover/ImageServer
+FIS source:        https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Fractional_Impervious_Surface/ImageServer
+Confidence source: https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Confidence/ImageServer
+LC confidence threshold: 75%
+============================================================
+
+Output GDB: C:\Users\Zacha\PycharmProjects\csu_nr_426\FinalProject\Data\BeaverConflictAnalysis.gdb
+==============================================================
+  BEAVER CONFLICT & RESTORATION — RESULTS SUMMARY
+  Boundary: Colorado Counties: Larimer
+==============================================================
+  OID   Unit                          Conflict   Restoration
+  ----------------------------------------------------------
+  1     Larimer County                   0.007         0.137
+==============================================================
+  Risk classes:  Very Low (0.0-0.2)  |  Low (0.2-0.4)  |  Moderate (0.4-0.6)  |  High (0.6-0.8)  |  Very High (0.8-1.0)
+
+
+Outputs written to: C:\Users\Zacha\PycharmProjects\csu_nr_426\FinalProject\Data\BeaverConflictAnalysis.gdb
+	- brat_clipped
+	- brat_riparian_buffer
+	- nlcd_clipped
+	- fis_clipped
+	- confidence_clipped
+	- conflict_risk
+	- restoration_opp
+	- planning_summary
