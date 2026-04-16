@@ -1,3 +1,11 @@
 NR426_GlobalMapProject/** filter=lfs diff=lfs merge=lfs -text
+FinalProject/Data/** filter=lfs diff=lfs merge=lfs -text
+FinalProject/Media/** filter=lfs diff=lfs merge=lfs -text
+FinalProject/Media/*git filter=lfs diff=lfs merge=lfs -text
+lfs filter=lfs diff=lfs merge=lfs -text
+track filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.mkv filter=lfs diff=lfs merge=lfs -text
+*.gdb/** filter=lfs diff=lfs merge=lfs -text
+CramtonZ_NR426_FinalProject.zip filter=lfs diff=lfs merge=lfs -text
+FinalProject/Media/CramtonZ_NR426_VideoExplaination.mkv filter=lfs diff=lfs merge=lfs -text
