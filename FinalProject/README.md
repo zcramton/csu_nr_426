@@ -171,9 +171,9 @@ each before use.
 | NLCD Land Cover | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover/ImageServer` | URL confirmed, resolves in tool |
 | FIS | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Fractional_Impervious_Surface/ImageServer` | URL confirmed, resolves in tool — must be clipped to local raster before use |
 | Confidence | `https://di-nlcd.img.arcgis.com/arcgis/rest/services/USA_NLCD_Annual_LandCover_Confidence/ImageServer` | URL confirmed, resolves in tool |
-| Census Counties | `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1` | Unverified |
-| HUC-8 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4` | Unverified |
-| HUC-12 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6` | Unverified |
+| Census Counties | `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/1` | URL confirmed, resolves in tool |
+| HUC-8 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/4` | URL confirmed, resolves in tool |
+| HUC-12 Watersheds | `https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/6` | URL confirmed, resolves in tool |
 
 ### BRAT Data Sources
 - **Colorado (default)**: Living Atlas — see `DEFAULT_BRAT_URL` in Constants block
