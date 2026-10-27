@@ -31,10 +31,12 @@ FinalProject/
 ├── README.md
 ├── requirements.txt
 ├── Media/
+│   ├── CramtonZ_NR426_VideoExplaination.mkv
 │   └── tbScript_ParameterSetup.png
 └── Data/
     ├── BeaverConflictAnalysis.gdb
-    └── Boundaries.gdb
+    ├── Boundaries.gdb
+    └── BeaverConflictAnalysisReport.txt
 ```
 
 Both Python files must be in the same directory.
@@ -43,7 +45,7 @@ Both Python files must be in the same directory.
 
 ## Requirements
 
-- ArcGIS Pro 3.6.2
+- ArcGIS Pro (Last tested in ArcGIS Pro 3.6.2 with Spatial Analyst, March 2026)
 - Spatial Analyst extension (required — checked at runtime)
 - Python 3.13 via the ArcGIS Pro conda environment (arcgispro-py3)
 - Active ArcGIS Online portal sign-in with Living Atlas access when using default service URLs
@@ -151,8 +153,8 @@ The tool validates the boundary layer before running:
 When using a **local raster**, NLCD must be in **EPSG 5070 (Conus Albers)** — the
 script checks this at startup and exits if it doesn't match. Reproject with
 Project Raster (WKID 5070) before running. This check is necessary because
-`arcpy.management.Clip` writes the clipped output in the file's native SR, so a
-mismatch causes the raster and buffer polygons to silently misalign in zonal statistics.
+`arcpy.management.Clip` writes the clipped output in the file's native SR. Hence, a
+mismatch causes the raster and buffer polygons to misalign in zonal statistics silently.
 
 When using a **Living Atlas image service URL**, the projection check is skipped.
 `arcpy.management.Clip` writes the clipped output using `arcpy.env.outputCoordinateSystem`
@@ -184,8 +186,8 @@ each before use.
 
 ## Outputs
 
-All saved to `BeaverConflictAnalysis.gdb` in your output directory, plus
-a `CramtonZ_BeaverConflict_Report.txt` summary file.
+All saved to `BeaverConflictAnalysis.gdb` in the output directory, plus
+a `BeaverConflict_Report.txt` summary file.
 
 | Layer | Description |
 |---|---|
@@ -284,7 +286,7 @@ the `SHARED CONSTANTS` block of the Tools file.
 
 ## Limitations
 
-This tool is a **spatial screening index**, not a hydraulic model.
+This tool is a **spatial screening index**, not a hydraulic model. It was developed as a class project and does not have ongoing refinement or support as developer access to some of the tools used has changed.
 
 - BRAT capacity is modeled potential, not confirmed beaver presence
 - NLCD 30m resolution may miss fine-scale land use variation
@@ -294,6 +296,11 @@ This tool is a **spatial screening index**, not a hydraulic model.
   correct them — treat flagged segments as candidates for field verification
 - No DEM flood routing — does not model actual inundation extent
 - Validate with field data before using results in planning decisions
+- Scores are min-max normalized within each run, so classes are relative to the analysis boundary; the same segment can fall in different classes in a county run and a statewide run
+- Conflict risk measures conflict with urban development only; agricultural land (NLCD 81–82) carries zero weight, though irrigation infrastructure is a common source of beaver conflict
+- When FIS is enabled, development intensity is counted twice (NLCD developed classes are defined by imperviousness, then scaled by FIS), which sharply reduces the weight of developed open space
+- Planning summary scores are unweighted means of intersecting segments; short and long segments count equally, and segments crossing a boundary count in both units
+- Buffers with no land cover data receive a development weight of 0, which lowers conflict scores and raises restoration scores for those segments
 
 ---
 
